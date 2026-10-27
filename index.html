@@ -1,185 +1,138 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Discover, explore and compare AI tools with AI Compass.">
-<title>AI Compass | Discover Better AI Tools</title>
-<style>
-:root{font-family:system-ui,Arial,sans-serif;color:#eaf0ff;background:#0b1120}
-*{box-sizing:border-box}
-body{margin:0}
-header{border-bottom:1px solid #26324a;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.logo{font-weight:800;font-size:22px;color:#62e5c5}
-nav a{color:#cbd5e1;text-decoration:none;margin-left:12px;font-size:13px}
-.hero{text-align:center;padding:65px 18px 40px;background:radial-gradient(ellipse at top,#18334a,#0b1120 70%)}
-h1{font-size:clamp(32px,7vw,58px);margin:0 0 15px}
-.hero p{color:#aebbd1;max-width:580px;margin:0 auto 25px;line-height:1.7}
-input{background:#192438;color:white;border:1px solid #394760;border-radius:12px;padding:16px;width:100%;max-width:550px;font-size:16px}
-main{max-width:1150px;margin:auto;padding:25px 18px}
-h2{font-size:23px}
-.filters{display:flex;flex-wrap:wrap;gap:9px;margin:22px 0}
-button{cursor:pointer;background:#1b2940;color:#eaf0ff;border:1px solid #33445f;border-radius:10px;padding:10px 14px}
-button.active,.primary{background:#42d6b0;color:#07121a;border-color:#42d6b0;font-weight:700}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-.card{background:#131e30;border:1px solid #293951;border-radius:16px;padding:21px}
-.card h3{margin:10px 0}
-.card p{color:#aebbd1;font-size:14px;line-height:1.6}
-.tag{color:#68e3c5;font-size:12px}
-.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-a{color:#68e3c5}
-.card a{font-size:13px}
-.compare{background:#14263a;border:1px solid #31536a;border-radius:16px;padding:20px;margin:28px 0}
-.compare table{width:100%;border-collapse:collapse;font-size:14px}
-td,th{padding:12px;border-bottom:1px solid #304158;text-align:left}
-.tablewrap{overflow-x:auto}
-.news{display:grid;gap:12px}
-.news article{padding:18px;border:1px solid #293951;border-radius:12px;background:#131e30}
-.news p{color:#aebbd1;font-size:14px}
-footer{text-align:center;padding:35px;color:#94a3b8;border-top:1px solid #293951;margin-top:40px;font-size:13px}
-small{color:#aebbd1}
-</style>
-</head>
-<body>
-<header>
-<div class="logo">✦ AI Compass</div>
-<nav>
-<a href="#tools">Tools</a>
-<a href="#comparison">Compare</a>
-<a href="#news">News</a>
-</nav>
-</header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="AI Compass helps you discover, compare, and evaluate AI tools with clear data, pricing context, and source links."
+    />
+    <meta
+      name="keywords"
+      content="AI tools, AI comparison, AI discovery, AI news, chatbots, AI research tools, AI coding assistants"
+    />
+    <title>AI Compass | Discover Better AI Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script src="assets/app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a href="index.html" class="brand" aria-label="AI Compass home">✦ AI Compass</a>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="index.html" class="active">Home</a>
+          <a href="tools.html">Tools</a>
+          <a href="comparison.html">Compare</a>
+          <a href="news.html">News</a>
+        </nav>
+      </div>
+    </header>
 
-<section class="hero">
-<h1>Discover Better AI Tools.</h1>
-<p>Explore, compare and understand AI tools.
-Make smarter decisions with clear information.</p>
-<input id="search" placeholder="Search AI tools..." aria-label="Search AI tools">
-</section>
+    <main>
+      <section class="hero">
+        <div class="container hero-inner">
+          <div class="hero-copy">
+            <span class="eyebrow">AI discovery platform</span>
+            <h1>Discover the right AI tool for the job.</h1>
+            <p>
+              Compare writing tools, coding copilots, research assistants, and image generators with
+              verified source links, pricing context, and clear strengths and trade-offs.
+            </p>
+            <div class="hero-actions">
+              <a class="button primary" href="tools.html">Explore tools</a>
+              <a class="button secondary" href="comparison.html">Compare tools</a>
+            </div>
+          </div>
+          <div class="hero-panel" aria-label="Overview stats">
+            <div class="stat-card">
+              <strong data-home-stat="count">0</strong>
+              <span>Tools tracked</span>
+            </div>
+            <div class="stat-card">
+              <strong data-home-stat="categories">0</strong>
+              <span>Categories</span>
+            </div>
+            <div class="stat-card">
+              <strong>Manual</strong>
+              <span>Source-based updates</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-<main>
-<section id="tools">
-<h2>Explore AI Tools</h2>
-<p><small>Curated starting catalog. Prices and features require verification.</small></p>
-<div class="filters" id="filters"></div>
-<div class="grid" id="cards"></div>
-</section>
+      <section class="section">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Featured tools</span>
+              <h2>Popular AI tools</h2>
+            </div>
+            <a href="tools.html" class="inline-link">View all tools →</a>
+          </div>
+          <div id="featured-tools" class="tool-grid" aria-live="polite"></div>
+        </div>
+      </section>
 
-<section class="compare" id="comparison">
-<h2>Compare AI Tools</h2>
-<p><small>Select up to three tools to compare their general purposes.</small></p>
-<div id="comparisonResult">Select tools above to begin.</div>
-<button onclick="clearComparison()">Clear selection</button>
-</section>
+      <section class="section alt-section">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Decision guidance</span>
+              <h2>Compare by use case</h2>
+            </div>
+          </div>
+          <div class="use-case-grid">
+            <article class="info-card">
+              <h3>Writing & ideation</h3>
+              <p>Best for summarizing, drafting, and refining everyday content.</p>
+            </article>
+            <article class="info-card">
+              <h3>Research & citations</h3>
+              <p>Useful when source attribution and speed matter more than deep creative control.</p>
+            </article>
+            <article class="info-card">
+              <h3>Coding assistance</h3>
+              <p>Helps with autocompletion, debugging, and dev workflow integration.</p>
+            </article>
+            <article class="info-card">
+              <h3>Image generation</h3>
+              <p>Best for creative, concept, and visual exploration workflows.</p>
+            </article>
+          </div>
+        </div>
+      </section>
 
-<section id="news">
-<h2>AI News & Updates</h2>
-<div class="news">
-<article>
-<strong>AI industry updates</strong>
-<p>Verified news articles and official product announcements will appear here after the news system is connected.</p>
-<a href="https://openai.com/news/" target="_blank" rel="noopener noreferrer">OpenAI official news</a>
-</article>
-<article>
-<strong>Model releases and research</strong>
-<p>Follow official research and product releases while the live news feature is under development.</p>
-<a href="https://blog.google/technology/ai/" target="_blank" rel="noopener noreferrer">Google AI updates</a>
-</article>
-</div>
-</section>
-</main>
+      <section class="section">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <span class="eyebrow">Latest updates</span>
+              <h2>AI news and announcements</h2>
+            </div>
+            <a href="news.html" class="inline-link">View all news →</a>
+          </div>
+          <div id="featured-news" class="news-list compact"></div>
+        </div>
+      </section>
+    </main>
 
-<footer>
-AI Compass — Independent AI Tools Discovery Platform
-<p>Prototype v0.1 · Not affiliated with listed AI providers.</p>
-</footer>
+    <footer class="site-footer">
+      <div class="container footer-shell">
+        <p>AI Compass — independent AI discovery and comparison.</p>
+        <p>Data is curated from official product pages and public announcements when available.</p>
+      </div>
+    </footer>
 
-<script>
-const tools=[
-{id:"chatgpt",name:"ChatGPT",category:"Writing",description:"General-purpose AI assistant for writing, learning, analysis and coding.",url:"https://chatgpt.com"},
-{id:"claude",name:"Claude",category:"Writing",description:"AI assistant for writing, document analysis, reasoning and coding.",url:"https://claude.ai"},
-{id:"gemini",name:"Gemini",category:"Research",description:"Google's AI assistant for research, writing and multimodal tasks.",url:"https://gemini.google.com"},
-{id:"perplexity",name:"Perplexity",category:"Research",description:"AI-powered answer engine with linked sources for research.",url:"https://www.perplexity.ai"},
-{id:"midjourney",name:"Midjourney",category:"Images",description:"AI-powered creative image generation platform.",url:"https://www.midjourney.com"},
-{id:"copilot",name:"GitHub Copilot",category:"Coding",description:"AI coding assistance integrated with developer workflows.",url:"https://github.com/features/copilot"}
-];
-
-let category="All";
-let selected=[];
-
-function renderFilters(){
-const categories=["All",...new Set(tools.map(t=>t.category))];
-document.getElementById("filters").innerHTML=categories.map(c=>
-`<button class="${category===c?'active':''}" data-category="${c}">${c}</button>`
-).join("");
-document.querySelectorAll("[data-category]").forEach(b=>{
-b.onclick=()=>{category=b.dataset.category;renderFilters();renderTools()};
-});
-}
-
-function renderTools(){
-const q=document.getElementById("search").value.toLowerCase();
-const filtered=tools.filter(t=>
-(category==="All"||t.category===category)&&
-(t.name+" "+t.description+" "+t.category).toLowerCase().includes(q)
-);
-document.getElementById("cards").innerHTML=filtered.length?
-filtered.map(t=>`
-<div class="card">
-<span class="tag">${t.category}</span>
-<h3>${t.name}</h3>
-<p>${t.description}</p>
-<div class="actions">
-<button class="${selected.includes(t.id)?'primary':''}" data-tool="${t.id}">
-${selected.includes(t.id)?"Selected ✓":"Compare +"}</button>
-<a href="${t.url}" target="_blank" rel="noopener noreferrer">Official site ↗</a>
-</div>
-</div>`).join(""):"<p>No tools found.</p>";
-
-document.querySelectorAll("[data-tool]").forEach(b=>{
-b.onclick=()=>toggleCompare(b.dataset.tool);
-});
-}
-
-function toggleCompare(id){
-if(selected.includes(id)){
-selected=selected.filter(x=>x!==id);
-}else{
-if(selected.length>=3){alert("Select up to 3 tools.");return}
-selected.push(id);
-}
-renderTools();
-renderComparison();
-}
-
-function renderComparison(){
-const chosen=selected.map(id=>tools.find(t=>t.id===id));
-const target=document.getElementById("comparisonResult");
-if(!chosen.length){
-target.textContent="Select tools above to begin.";
-return;
-}
-target.innerHTML=`
-<div class="tablewrap"><table>
-<thead><tr><th>Feature</th>${chosen.map(t=>`<th>${t.name}</th>`).join("")}</tr></thead>
-<tbody>
-<tr><td>Category</td>${chosen.map(t=>`<td>${t.category}</td>`).join("")}</tr>
-<tr><td>Primary use</td>${chosen.map(t=>`<td>${t.description}</td>`).join("")}</tr>
-<tr><td>Pricing</td>${chosen.map(()=>"<td>Check official site</td>").join("")}</tr>
-</tbody>
-</table></div>`;
-}
-
-function clearComparison(){
-selected=[];
-renderTools();
-renderComparison();
-}
-
-document.getElementById("search").addEventListener("input",renderTools);
-renderFilters();
-renderTools();
-renderComparison();
-</script>
-</body>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        window.aiCompassApp && window.aiCompassApp.initHome();
+      });
+    </script>
+  </body>
 </html>

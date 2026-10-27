@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Browse AI tools, compare capabilities, pricing context, and source-backed notes on AI Compass."
+    />
+    <title>AI Tools Catalog | AI Compass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script src="assets/app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a href="index.html" class="brand" aria-label="AI Compass home">✦ AI Compass</a>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="index.html">Home</a>
+          <a href="tools.html" class="active">Tools</a>
+          <a href="comparison.html">Compare</a>
+          <a href="news.html">News</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="section page-head">
+        <div class="container narrow">
+          <span class="eyebrow">Catalog</span>
+          <h1>AI tools directory</h1>
+          <p class="page-intro">Browse tools by category, strengths, and source-backed facts.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container narrow">
+          <div class="toolbar">
+            <label class="search-wrap" for="tool-search">
+              <span class="sr-only">Search tools</span>
+              <input id="tool-search" type="search" placeholder="Search tools or use cases" aria-label="Search tools" />
+            </label>
+          </div>
+          <div id="category-filters" class="chip-row" aria-label="Filter by category"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div id="tool-list" class="tool-grid" aria-live="polite"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-shell">
+        <p>AI Compass — independent AI discovery and comparison.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        window.aiCompassApp && window.aiCompassApp.initToolsPage();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "news": [
+    {
+      "title": "OpenAI releases product updates and model roadmap notes",
+      "date": "2026-10-20",
+      "tag": "Official",
+      "summary": "OpenAI continues to publish updates across product and model capabilities, with official product pages serving as the primary reference point.",
+      "source_url": "https://openai.com/news/"
+    },
+    {
+      "title": "Google continues AI research and product announcements across Gemini",
+      "date": "2026-10-16",
+      "tag": "Official",
+      "summary": "Google's AI updates are typically tracked through official product releases and its AI blog, which remains the most reliable source for recent announcements.",
+      "source_url": "https://blog.google/technology/ai/"
+    },
+    {
+      "title": "Anthropic publishes product and safety updates for Claude",
+      "date": "2026-10-10",
+      "tag": "Official",
+      "summary": "Anthropic's product and safety updates continue to shape how developers evaluate model quality, availability, and enterprise use cases.",
+      "source_url": "https://www.anthropic.com/news"
+    },
+    {
+      "title": "GitHub expands developer AI workflows and Copilot documentation",
+      "date": "2026-10-04",
+      "tag": "Developer tools",
+      "summary": "GitHub's official documentation and product updates remain the primary source for Copilot release notes and enterprise adoption details.",
+      "source_url": "https://github.blog/category/ai/"
+    },
+    {
+      "title": "AI market coverage focuses on pricing, capabilities, and enterprise adoption",
+      "date": "2026-09-28",
+      "tag": "Market",
+      "summary": "AI market reporting is useful for trend monitoring, but tool-specific pricing and feature details should always be checked on the official provider pages.",
+      "source_url": "https://www.theverge.com/ai-artificial-intelligence"
+    }
+  ]
+}
