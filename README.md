@@ -1,28 +1,23 @@
 # AI Compass
 
-AI Compass is a lightweight static discovery platform for comparing AI tools without paying for hosting or using a framework.
+AI Compass is a lightweight static discovery platform for comparing AI tools with a verified-data foundation and no paid API dependency.
 
-## Features
+## Verified data foundation
 
-- GitHub Pages ready static site
-- Responsive homepage and category browsing
-- Tool detail pages with strengths, limitations, and source links
-- Comparison matrix for up to three tools
-- Manual, source-backed news list
-- JSON-driven data model for tool and news records
-- No paid API dependency
+This project now treats tool and pricing data as a source-backed dataset rather than a marketing dump. The site intentionally keeps all data in static JSON files and avoids unverified claims.
 
 ## Project structure
 
 - `index.html` — homepage
-- `tools.html` — tools directory
+- `tools.html` — tool directory
 - `comparison.html` — comparison page
-- `news.html` — curated AI news page
+- `news.html` — curated news page
 - `tool.html` — individual tool detail page
 - `assets/styles.css` — shared styling
 - `assets/app.js` — data fetching and rendering logic
-- `data/tools.json` — tool catalog data
-- `data/news.json` — curated news feed data
+- `data/tools.json` — verified, partial, and unverified tool catalog data
+- `data/news.json` — empty or source-backed news dataset only
+- `tests/validate_data.py` — JSON and field validation checks
 
 ## Local preview
 
@@ -42,11 +37,22 @@ This project is designed for GitHub Pages with no build step.
 
 1. Push the repository to GitHub.
 2. In the repository settings, enable GitHub Pages.
-3. Set the source to the default branch (for example, `main`).
+3. Set the source to the default branch (for example `main`).
 4. The site will be available at:
    `https://skhm9.github.io/ai-compass/`
 
+## Data validation tests
+
+Run the validation script from the repository root:
+
+```bash
+python3 tests/validate_data.py
+```
+
+This validates JSON syntax, required fields, minimum tool count, and URL structure. It does not validate the external truth of the tool claims themselves.
+
 ## Notes
 
-- Pricing and product details are intentionally conservative and use source-backed wording where verification is necessary.
-- The data model is simple and editable for future updates.
+- Pricing and feature summaries are intentionally conservative.
+- A URL alone is not treated as proof of correctness; claims must match the referenced source.
+- If data is not verifiable, the UI shows the relevant status instead of making a definitive claim.

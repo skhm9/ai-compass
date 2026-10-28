@@ -1,26 +1,14 @@
 (function () {
-  const apiBase = './';
   const DATA_CACHE = new Map();
 
-  function safeText(value, fallback = 'Not verified') {
-    if (value === undefined || value === null || value === '') return fallback;
-    if (Array.isArray(value)) return value.length ? value.join(', ') : fallback;
-    return value;
+  function safeArray(value) {
+    return Array.isArray(value) ? value : [];
   }
 
-  function renderRetryBlock(message, onRetry, label = 'Retry') {
-    return `
-      <div class="error-panel" role="alert">
-        <p>${message}</p>
-        <button type="button" class="button primary retry-button" data-retry="${label}">${label}</button>
-      </div>
-    `;
-  }
-
-  function attachRetryHandlers(container, retryFn) {
-    const retryButton = container.querySelector('.retry-button');
-    if (!retryButton) return;
-    retryButton.addEventListener('click', retryFn);
+  function normalizeStatus(value) {
+    const status = (value || 'unverified').toLowerCase();
+    if (['verified', 'partial', 'unverified'].includes(status)) return status;
+    return 'unverified';
   }
 
   function fetchJson(path) {
@@ -28,7 +16,7 @@
       return Promise.resolve(DATA_CACHE.get(path));
     }
 
-    return fetch(`${apiBase}${path}`, { cache: 'force-cache' })
+    return fetch(`${window.location.origin}${window.location.pathname.includes('/ai-compass') ? '/ai-compass/' : '/'}${path.replace(/^\.\//, '')}`, { cache: 'force-cache' })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Failed to load ${path}: ${response.status}`);
@@ -41,23 +29,43 @@
       });
   }
 
+  function getRelativeAssetPath(path) {
+    if (path.startsWith('./')) return path.replace(/^\.\//, '');
+    return path;
+  }
+
+  function renderStatusBadge(status) {
+    const normalized = normalizeStatus(status);
+    return `<span class="status-badge ${normalized}">${normalized}</span>`;
+  }
+
   function renderToolCard(tool) {
+    const toolPrice = tool.pricing_summary || 'Price needs verification';
+    const status = normalizeStatus(tool.verification_status);
+    const sourceLinks = safeArray(tool.source_urls)
+      .map((url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">Source</a>`)
+      .join('');
+
     return `
       <article class="tool-card" aria-label="${tool.name}">
         <div class="tool-card-header">
-          <span class="tool-category">${safeText(tool.category, 'General')}</span>
-          <span class="meta-pill">Verified ${safeText(tool.last_verified, 'N/A')}</span>
+          <span class="tool-category">${tool.category || 'General'}</span>
+          ${renderStatusBadge(status)}
         </div>
         <h3>${tool.name}</h3>
-        <p>${safeText(tool.summary)}</p>
+        <p>${tool.description || 'Description not yet verified.'}</p>
         <div class="meta-row">
-          <span class="meta-pill">Best for: ${safeText(tool.best_for, 'General use')}</span>
-          <span class="meta-pill">Price: ${safeText(tool.pricing_summary, 'Not verified')}</span>
+          <span class="meta-pill">Developer: ${tool.developer || 'Not verified'}</span>
+          <span class="meta-pill">Verified: ${tool.last_verified || 'Not recorded'}</span>
+        </div>
+        <div class="meta-row compact-row">
+          <span class="meta-pill">Price: ${toolPrice}</span>
         </div>
         <div class="actions">
           <a class="button secondary" href="tool.html?id=${tool.id}">View details</a>
-          <a class="inline-link" href="${tool.website}" target="_blank" rel="noopener noreferrer">Official site →</a>
+          <a class="inline-link" href="${tool.website || '#'}" target="_blank" rel="noopener noreferrer">Official site →</a>
         </div>
+        <div class="source-stack">${sourceLinks}</div>
       </article>
     `;
   }
@@ -66,16 +74,32 @@
     return `
       <article class="news-card">
         <div class="news-card-header">
-          <span class="news-tag">${safeText(item.tag, 'Update')}</span>
-          <time datetime="${item.date}">${safeText(item.date)}</time>
+          <span class="news-tag">${item.tag || 'Source'}</span>
+          <time datetime="${item.date || ''}">${item.date || 'Date unavailable'}</time>
         </div>
-        <h3>${item.title}</h3>
-        <p>${item.summary}</p>
+        <h3>${item.title || 'Untitled update'}</h3>
+        <p>${item.summary || 'No summary provided.'}</p>
         <div class="sources">
-          <a href="${item.source_url}" target="_blank" rel="noopener noreferrer">Source</a>
+          <a href="${item.source_url}" target="_blank" rel="noopener noreferrer">Original source</a>
         </div>
       </article>
     `;
+  }
+
+  function renderRetryBlock(message, onRetry, label = 'Retry') {
+    return `
+      <div class="error-panel" role="alert">
+        <p>${message}</p>
+        <button type="button" class="button primary retry-button" data-retry="${label}">${label}</button>
+      </div>
+    `;
+  }
+
+  function attachRetryHandlers(container, retryFn) {
+    const button = container.querySelector('.retry-button');
+    if (button) {
+      button.addEventListener('click', retryFn);
+    }
   }
 
   function populateFeaturedTools() {
@@ -85,21 +109,21 @@
     const load = () => {
       fetchJson('data/tools.json')
         .then((data) => {
-          const tools = Array.isArray(data.tools) ? data.tools : [];
-          const featured = tools.slice(0, 4);
-          featuredContainer.innerHTML = featured.map(renderToolCard).join('');
+          const tools = safeArray(data.tools).slice(0, 4);
+          featuredContainer.innerHTML = tools.map(renderToolCard).join('');
 
           const count = document.querySelector('[data-home-stat="count"]');
           const categories = document.querySelector('[data-home-stat="categories"]');
-          if (count) count.textContent = String(tools.length);
+          if (count) count.textContent = String(safeArray(data.tools).length);
           if (categories) {
-            const uniqueCategories = new Set(tools.map((tool) => tool.category).filter(Boolean));
+            const uniqueCategories = new Set(safeArray(data.tools).map((tool) => tool.category).filter(Boolean));
             categories.textContent = String(uniqueCategories.size);
           }
         })
         .catch((error) => {
           console.error(error);
           featuredContainer.innerHTML = renderRetryBlock('Unable to load the featured tools right now.', load, 'Retry tools');
+          attachRetryHandlers(featuredContainer, load);
         });
     };
 
@@ -113,12 +137,22 @@
     const load = () => {
       fetchJson('data/news.json')
         .then((data) => {
-          const items = Array.isArray(data.news) ? data.news.slice(0, 3) : [];
+          const items = safeArray(data.news).slice(0, 3);
+          if (!items.length) {
+            container.innerHTML = `
+              <div class="info-card">
+                <h3>No verified news available</h3>
+                <p>${data.empty_message || 'No verified updates are currently available for this dataset.'}</p>
+              </div>
+            `;
+            return;
+          }
           container.innerHTML = items.map(renderNewsCard).join('');
         })
         .catch((error) => {
           console.error(error);
           container.innerHTML = renderRetryBlock('Unable to load the latest AI news right now.', load, 'Retry news');
+          attachRetryHandlers(container, load);
         });
     };
 
@@ -135,7 +169,7 @@
     const load = () => {
       fetchJson('data/tools.json')
         .then((data) => {
-          const tools = Array.isArray(data.tools) ? data.tools : [];
+          const tools = safeArray(data.tools);
           const categories = ['All', ...new Set(tools.map((tool) => tool.category).filter(Boolean))];
           let activeFilter = 'All';
           let query = '';
@@ -143,7 +177,7 @@
           function renderTools() {
             const filtered = tools.filter((tool) => {
               const matchesCategory = activeFilter === 'All' || tool.category === activeFilter;
-              const haystack = `${tool.name} ${tool.summary} ${tool.best_for} ${tool.category}`.toLowerCase();
+              const haystack = `${tool.name || ''} ${tool.description || ''} ${tool.category || ''} ${tool.use_cases?.join(' ') || ''}`.toLowerCase();
               const matchesQuery = haystack.includes(query.trim().toLowerCase());
               return matchesCategory && matchesQuery;
             });
@@ -167,10 +201,12 @@
             });
           });
 
-          searchInput.addEventListener('input', (event) => {
-            query = event.target.value;
-            renderTools();
-          });
+          if (searchInput) {
+            searchInput.addEventListener('input', (event) => {
+              query = event.target.value;
+              renderTools();
+            });
+          }
 
           renderTools();
         })
@@ -194,7 +230,7 @@
     const load = () => {
       fetchJson('data/tools.json')
         .then((data) => {
-          const tools = Array.isArray(data.tools) ? data.tools : [];
+          const tools = safeArray(data.tools);
           const tool = tools.find((entry) => entry.id === toolId);
 
           if (!tool) {
@@ -208,57 +244,61 @@
             return;
           }
 
-          const strengths = Array.isArray(tool.strengths) ? tool.strengths : [];
-          const limitations = Array.isArray(tool.limitations) ? tool.limitations : [];
-          const features = Array.isArray(tool.features) ? tool.features : [];
-          const sources = Array.isArray(tool.sources) ? tool.sources : [];
+          const features = safeArray(tool.features);
+          const limitations = safeArray(tool.limitations);
+          const useCases = safeArray(tool.use_cases);
+          const sources = safeArray(tool.source_urls);
 
           container.innerHTML = `
             <article class="detail-panel">
               <div class="detail-header">
                 <div>
                   <div class="detail-topline">
-                    <span class="tool-category">${safeText(tool.category, 'General')}</span>
-                    <span class="meta-pill">Last verified: ${safeText(tool.last_verified, 'Not verified')}</span>
+                    <span class="tool-category">${tool.category || 'General'}</span>
+                    ${renderStatusBadge(tool.verification_status)}
+                    <span class="meta-pill">Last verified: ${tool.last_verified || 'Not recorded'}</span>
                   </div>
                   <h1>${tool.name}</h1>
-                  <p class="page-intro">${safeText(tool.summary)}</p>
+                  <p class="page-intro">${tool.description || 'Description not yet verified.'}</p>
                 </div>
-                <a class="button primary" href="${tool.website}" target="_blank" rel="noopener noreferrer">Official site</a>
+                <a class="button primary" href="${tool.website || '#'}" target="_blank" rel="noopener noreferrer">Official site</a>
               </div>
               <div class="detail-grid">
                 <div class="detail-card">
-                  <h3>Best for</h3>
-                  <p>${safeText(tool.best_for, 'General-purpose use')}</p>
+                  <h3>Developer</h3>
+                  <p>${tool.developer || 'Not verified'}</p>
                 </div>
                 <div class="detail-card">
-                  <h3>Pricing context</h3>
-                  <p>${safeText(tool.pricing_summary, 'Pricing not verified')}</p>
+                  <h3>Pricing</h3>
+                  <p>${tool.pricing_summary || 'Price needs verification'}</p>
+                  <div class="sources">
+                    <a href="${tool.pricing_url || tool.website || '#'}" target="_blank" rel="noopener noreferrer">Pricing</a>
+                  </div>
                 </div>
                 <div class="detail-card">
-                  <h3>Availability</h3>
-                  <p>${safeText(tool.availability, 'Not verified')}</p>
+                  <h3>Verification</h3>
+                  <p>Verification state: ${normalizeStatus(tool.verification_status)}. Information should be checked against the official source before making claims about pricing, feature access, or availability.</p>
                 </div>
               </div>
               <div class="detail-grid">
+                <div class="detail-card">
+                  <h3>Primary use cases</h3>
+                  <ul>${useCases.length ? useCases.map((item) => `<li>${item}</li>`).join('') : '<li>Not recorded</li>'}</ul>
+                </div>
                 <div class="detail-card">
                   <h3>Features</h3>
-                  <ul>${features.length ? features.map((item) => `<li>${item}</li>`).join('') : '<li>Not verified</li>'}</ul>
+                  <ul>${features.length ? features.map((item) => `<li>${item}</li>`).join('') : '<li>Not recorded</li>'}</ul>
                 </div>
                 <div class="detail-card">
-                  <h3>Strengths</h3>
-                  <ul>${strengths.length ? strengths.map((item) => `<li>${item}</li>`).join('') : '<li>Not verified</li>'}</ul>
-                </div>
-                <div class="detail-card">
-                  <h3>Limitations</h3>
-                  <ul>${limitations.length ? limitations.map((item) => `<li>${item}</li>`).join('') : '<li>Not verified</li>'}</ul>
+                  <h3>Known limitations</h3>
+                  <ul>${limitations.length ? limitations.map((item) => `<li>${item}</li>`).join('') : '<li>Not recorded</li>'}</ul>
                 </div>
               </div>
               <div class="detail-grid">
                 <div class="detail-card">
-                  <h3>Signal sources</h3>
+                  <h3>Official sources</h3>
                   <div class="sources">
-                    ${sources.length ? sources.map((source) => `<a href="${source.url}" target="_blank" rel="noopener noreferrer">${source.label}</a>`).join('') : '<span class="list-note">No sources listed.</span>'}
+                    ${sources.length ? sources.map((url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">Source</a>`).join('') : '<span class="list-note">No sources listed.</span>'}
                   </div>
                 </div>
               </div>
@@ -286,14 +326,14 @@
     const load = () => {
       fetchJson('data/tools.json')
         .then((data) => {
-          const tools = Array.isArray(data.tools) ? data.tools : [];
+          const tools = safeArray(data.tools);
           const options = ['<option value="">Select a tool</option>'].concat(tools.map((tool) => `<option value="${tool.id}">${tool.name}</option>`)).join('');
 
           selectOne.innerHTML = options;
           selectTwo.innerHTML = options;
           selectThree.innerHTML = options;
 
-          const defaultOptions = ['chatgpt', 'claude', 'perplexity'];
+          const defaultOptions = ['chatgpt', 'claude', 'gemini'];
           [selectOne, selectTwo, selectThree].forEach((select, index) => {
             if (defaultOptions[index]) select.value = defaultOptions[index];
           });
@@ -313,13 +353,14 @@
             }
 
             const rows = [
+              ['Developer', (tool) => tool.developer || 'Not verified'],
               ['Category', (tool) => tool.category || 'Not verified'],
-              ['Best for', (tool) => tool.best_for || 'Not verified'],
-              ['Pricing', (tool) => tool.pricing_summary || 'Not verified'],
-              ['Availability', (tool) => tool.availability || 'Not verified'],
-              ['Strengths', (tool) => (tool.strengths && tool.strengths.length ? tool.strengths.join('; ') : 'Not verified')],
-              ['Limitations', (tool) => (tool.limitations && tool.limitations.length ? tool.limitations.join('; ') : 'Not verified')],
-              ['Last verified', (tool) => tool.last_verified || 'Not verified']
+              ['Pricing', (tool) => tool.pricing_summary || 'Price needs verification'],
+              ['Verification state', (tool) => normalizeStatus(tool.verification_status)],
+              ['Last verified', (tool) => tool.last_verified || 'Not recorded'],
+              ['Features', (tool) => safeArray(tool.features).join('; ') || 'Not recorded'],
+              ['Limitations', (tool) => safeArray(tool.limitations).join('; ') || 'Not recorded'],
+              ['Use cases', (tool) => safeArray(tool.use_cases).join('; ') || 'Not recorded']
             ];
 
             output.innerHTML = `
@@ -334,7 +375,7 @@
                   ${rows.map(([label, getter]) => `
                     <tr>
                       <td>${label}</td>
-                      ${selected.map((tool) => `<td>${safeText(getter(tool), 'Not verified')}</td>`).join('')}
+                      ${selected.map((tool) => `<td>${getter(tool)}</td>`).join('')}
                     </tr>
                   `).join('')}
                 </tbody>
@@ -365,7 +406,16 @@
     const load = () => {
       fetchJson('data/news.json')
         .then((data) => {
-          const items = Array.isArray(data.news) ? data.news : [];
+          const items = safeArray(data.news);
+          if (!items.length) {
+            container.innerHTML = `
+              <div class="info-card">
+                <h3>No verified news available</h3>
+                <p>${data.empty_message || 'No verified updates are currently available for this dataset.'}</p>
+              </div>
+            `;
+            return;
+          }
           container.innerHTML = items.map(renderNewsCard).join('');
         })
         .catch((error) => {
@@ -391,3 +441,4 @@
     initNewsPage,
   };
 })();
+

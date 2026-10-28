@@ -3,234 +3,363 @@
     {
       "id": "chatgpt",
       "name": "ChatGPT",
-      "category": "Writing",
-      "summary": "General-purpose conversational AI for writing, brainstorming, coding help, and analysis.",
-      "best_for": "Writing, learning, coding, summarization",
-      "pricing_summary": "Free tier available; paid plans vary by usage and model access",
-      "availability": "Web, mobile apps, API access",
-      "last_verified": "2026-10-27",
+      "developer": "OpenAI",
+      "category": "General assistant",
+      "description": "Conversational AI assistant for writing, coding, brainstorming, research synthesis, and multimodal analysis.",
       "website": "https://chatgpt.com",
-      "strengths": [
-        "Extremely versatile for everyday AI tasks",
-        "Strong general writing and summarization capability",
-        "Widely used for coding assistance and ideation"
+      "pricing_url": "https://chatgpt.com/pricing",
+      "pricing_summary": "Official pricing lists ChatGPT Go at $8/month, ChatGPT Plus at $20/month, and ChatGPT Pro at $100/month; multiple tiers and local pricing can vary by region.",
+      "pricing_currency": "USD",
+      "pricing_period": "monthly",
+      "last_verified": "2026-10-28",
+      "verification_status": "partial",
+      "features": [
+        "Natural-language chat and brainstorming",
+        "File upload and analysis",
+        "Coding assistance and code generation",
+        "Image generation and multimodal workflows in supported plans"
       ],
       "limitations": [
-        "Accuracy depends on prompt quality and model chosen",
-        "Not all tasks are equally strong for deep research workflows",
-        "Fact checks should still be verified when accuracy matters"
+        "Accuracy may still require external verification for high-stakes tasks",
+        "Some advanced features are tied to specific plans or model access",
+        "Performance and availability can vary by region and usage level"
       ],
-      "features": [
-        "Chat-based workflow",
-        "File analysis and image understanding in supported plans",
-        "Custom GPTs and advanced workflows in higher tiers"
+      "use_cases": [
+        "Writing and ideation",
+        "Coding help",
+        "Research synthesis",
+        "Learning and summarization"
       ],
-      "sources": [
-        { "label": "OpenAI product page", "url": "https://openai.com/chatgpt/" }
+      "source_urls": [
+        "https://chatgpt.com",
+        "https://chatgpt.com/pricing",
+        "https://openai.com/index/introducing-chatgpt-go/"
       ]
     },
     {
       "id": "claude",
       "name": "Claude",
-      "category": "Writing",
-      "summary": "AI assistant designed for long-form reasoning, drafting, and document analysis.",
-      "best_for": "Writing, reading large documents, synthesis",
-      "pricing_summary": "Free and paid tiers may vary by region and plan",
-      "availability": "Web and app access",
-      "last_verified": "2026-10-27",
+      "developer": "Anthropic",
+      "category": "General assistant",
+      "description": "AI assistant focused on long-form reasoning, document analysis, drafting, and careful synthesis across large inputs.",
       "website": "https://claude.ai",
-      "strengths": [
-        "Strong at long-form text work",
-        "Helpful for reading and summarizing documents",
-        "Clear writing style for drafting and editing"
+      "pricing_url": "https://docs.anthropic.com/claude/docs/model-pricing",
+      "pricing_summary": "Anthropic publishes model-specific pricing for Claude Haiku, Sonnet, and Opus; pricing is token-based and varies by model and usage mode.",
+      "pricing_currency": "USD",
+      "pricing_period": "per million tokens",
+      "last_verified": "2026-10-28",
+      "verification_status": "partial",
+      "features": [
+        "Long-context reasoning and drafting",
+        "Document analysis and summarization",
+        "Strong writing and editing workflows",
+        "Model options tuned for different use cases"
       ],
       "limitations": [
-        "Some research tasks still need external verification",
-        "Feature access can vary by plan",
-        "Not always best for real-time, highly structured coding workflows"
+        "Some research tasks still require source checking",
+        "API pricing can be cost-sensitive for large workloads",
+        "Feature access may vary by plan or deployment type"
       ],
-      "features": [
-        "Long-context document handling",
-        "Drafting and rewriting assistance",
-        "Structured analysis for professional writing tasks"
+      "use_cases": [
+        "Writing and editing",
+        "Long-document analysis",
+        "Research synthesis",
+        "Drafting and review workflows"
       ],
-      "sources": [
-        { "label": "Anthropic Claude overview", "url": "https://www.anthropic.com/claude" }
+      "source_urls": [
+        "https://claude.ai",
+        "https://docs.anthropic.com/claude/docs/model-pricing",
+        "https://www.anthropic.com/claude/sonnet"
       ]
     },
     {
       "id": "gemini",
       "name": "Gemini",
-      "category": "Research",
-      "summary": "Google AI assistant tuned for multimodal research, content support, and search-driven tasks.",
-      "best_for": "Research, multimodal tasks, web-grounded answers",
-      "pricing_summary": "Free access and paid tiers may vary depending on Google AI plan",
-      "availability": "Web and mobile app access",
-      "last_verified": "2026-10-27",
-      "website": "https://gemini.google.com",
-      "strengths": [
-        "Strong multimodal support",
-        "Useful when web-connected research and Google ecosystem are important",
-        "Good for brainstorming and summarization"
+      "developer": "Google",
+      "category": "General assistant",
+      "description": "Google's multimodal assistant for writing, research, coding support, and AI-powered productivity features integrated with Google apps.",
+      "website": "https://gemini.google.com/app",
+      "pricing_url": "https://gemini.google.com/advanced",
+      "pricing_summary": "Google offers a Free tier, Google AI Pro at $19.99/month, and AI Ultra with premium plan benefits; feature bundles and storage can vary by plan.",
+      "pricing_currency": "USD",
+      "pricing_period": "monthly",
+      "last_verified": "2026-10-28",
+      "verification_status": "partial",
+      "features": [
+        "Multimodal understanding and generation",
+        "Google ecosystem integration",
+        "Research and productivity workflows",
+        "Image and content generation in supported features"
       ],
       "limitations": [
-        "Quality can vary by task type",
-        "Source checking remains necessary for sensitive research",
-        "Practical fit depends on ecosystem and workflow"
+        "Exact access and limits can vary by plan and geography",
+        "Some advanced features require premium or bundled Google services",
+        "Output quality still depends on prompt quality and task complexity"
       ],
-      "features": [
-        "Multimodal summaries and file support",
-        "Research-driven and search-assisted workflows",
-        "Google integration in many products"
+      "use_cases": [
+        "Research and ideation",
+        "Productivity and document workflows",
+        "Image generation and visual exploration",
+        "Coding assistance"
       ],
-      "sources": [
-        { "label": "Google Gemini landing page", "url": "https://gemini.google.com/" }
+      "source_urls": [
+        "https://gemini.google.com/app",
+        "https://gemini.google.com/advanced",
+        "https://ai.google.dev/"
       ]
     },
     {
       "id": "perplexity",
       "name": "Perplexity",
-      "category": "Research",
-      "summary": "AI-powered answer engine designed for search-oriented questions with source links.",
-      "best_for": "Quick research, source-backed answers, fact-finding",
-      "pricing_summary": "Free access with paid tiers and speed/model options",
-      "availability": "Web and app access",
-      "last_verified": "2026-10-27",
+      "developer": "Perplexity AI",
+      "category": "Research assistant",
+      "description": "Search-first AI assistant that provides answers with source citations and is designed for research, quick discovery, and answer synthesis.",
       "website": "https://www.perplexity.ai",
-      "strengths": [
-        "Strong source-linked answers",
-        "Fast exploration for research questions",
-        "Gives a clear starting point for fact-finding"
+      "pricing_url": "https://www.perplexity.ai/pricing",
+      "pricing_summary": "Perplexity lists a Free plan, Pro at $17/month when billed annually, and Max at $167/month; enterprise plans are also available.",
+      "pricing_currency": "USD",
+      "pricing_period": "monthly",
+      "last_verified": "2026-10-28",
+      "verification_status": "partial",
+      "features": [
+        "Cited answers and research-oriented search",
+        "AI model selection in supported plans",
+        "Deep-research workflows and reasoning features",
+        "Web-grounded synthesis"
       ],
       "limitations": [
-        "Less useful than a writing assistant for deeper long-form drafting",
-        "Source quality still needs human judgment",
-        "Search summaries are not always definitive"
+        "Citations need checking in sensitive or nuanced topics",
+        "Advanced features and limits depend on plan tier",
+        "Model availability and feature packs can change over time"
       ],
-      "features": [
-        "Cited answers and source references",
-        "Web-informed search summaries",
-        "Topic exploration and follow-up research"
+      "use_cases": [
+        "Fast research",
+        "Source-backed answer discovery",
+        "Competitive intelligence",
+        "Exploration of topics and product summaries"
       ],
-      "sources": [
-        { "label": "Perplexity product page", "url": "https://www.perplexity.ai/" }
+      "source_urls": [
+        "https://www.perplexity.ai",
+        "https://www.perplexity.ai/pricing",
+        "https://www.perplexity.ai/help-center/en/articles/11187416-which-perplexity-subscription-plan-is-right-for-you"
       ]
     },
     {
-      "id": "copilot",
+      "id": "github-copilot",
       "name": "GitHub Copilot",
-      "category": "Coding",
-      "summary": "AI coding assistant integrated into development workflows and editors.",
-      "best_for": "Code suggestions, debugging, boilerplate generation",
-      "pricing_summary": "Paid and enterprise plans commonly apply; verification is needed per plan",
-      "availability": "IDE integrations, GitHub, enterprise workflows",
-      "last_verified": "2026-10-27",
+      "developer": "GitHub",
+      "category": "Developer tools",
+      "description": "AI coding assistant integrated into developer workflows for code generation, tests, refactoring, and repository-aware help.",
       "website": "https://github.com/features/copilot",
-      "strengths": [
-        "Strong code completion and inline assistance",
-        "Good fit for repeated engineering tasks",
-        "Works naturally in developer tooling"
+      "pricing_url": "https://github.com/features/copilot#pricing",
+      "pricing_summary": "GitHub lists Free, Pro at $10/user/month, Pro+ at $39/user/month, and Max at $100/user/month; enterprise and team pricing is also available.",
+      "pricing_currency": "USD",
+      "pricing_period": "monthly",
+      "last_verified": "2026-10-28",
+      "verification_status": "partial",
+      "features": [
+        "Code completion and inline assistance",
+        "Repository-aware suggestions",
+        "Agentic development workflows",
+        "Testing and refactoring support"
       ],
       "limitations": [
-        "Not a full replacement for code review",
-        "Output quality depends on repository context",
-        "Best value is realized within active engineering workflows"
+        "Code output still requires review and testing",
+        "Large enterprise pricing can vary by contract",
+        "Feature set differs by plan and organization setup"
       ],
-      "features": [
-        "IDE chat and code generation",
-        "Context-aware coding suggestions",
-        "Developer workflow integration"
+      "use_cases": [
+        "Code completion",
+        "Bug fixing",
+        "Refactoring",
+        "Developer onboarding and speed improvements"
       ],
-      "sources": [
-        { "label": "GitHub Copilot overview", "url": "https://github.com/features/copilot" }
+      "source_urls": [
+        "https://github.com/features/copilot",
+        "https://github.com/features/copilot#pricing",
+        "https://github.com/features/copilot/"
       ]
     },
     {
       "id": "midjourney",
       "name": "Midjourney",
-      "category": "Images",
-      "summary": "Creative AI image generation platform focused on artistic visuals and concept exploration.",
-      "best_for": "Concept art, imaginative illustration, visual exploration",
-      "pricing_summary": "Subscription model commonly used; verify official pricing page",
-      "availability": "Discord-based workflow and web access depending on plan",
-      "last_verified": "2026-10-27",
+      "developer": "Midjourney",
+      "category": "Image generation",
+      "description": "Image generation platform focused on creative visual exploration, concept art, and stylized production workflows.",
       "website": "https://www.midjourney.com",
-      "strengths": [
-        "Excellent artistic output and aesthetic control",
-        "Strong for concept-creation and visual ideation",
-        "Works well for creative exploration"
+      "pricing_url": "https://www.midjourney.com/pricing/",
+      "pricing_summary": "Official pricing pages list multiple subscription tiers for image generation; exact plan names and costs should be checked on the current pricing page for the user's region.",
+      "pricing_currency": "USD",
+      "pricing_period": "monthly",
+      "last_verified": "2026-10-28",
+      "verification_status": "partial",
+      "features": [
+        "High-quality image generation",
+        "Stylized creative outputs",
+        "Iterative image refinement",
+        "Prompt-driven concept generation"
       ],
       "limitations": [
-        "Workflow can be less straightforward for newcomers",
-        "Best for creative visuals, not always for precise technical images",
-        "Commercial use obligations should be checked in official terms"
+        "Exact pricing and plan availability can change",
+        "Image generation requires careful prompt design",
+        "Commercial use should be checked against current licensing terms"
       ],
+      "use_cases": [
+        "Concept art",
+        "Illustration",
+        "Brand moodboards",
+        "Creative ideation"
+      ],
+      "source_urls": [
+        "https://www.midjourney.com",
+        "https://www.midjourney.com/pricing/",
+        "https://docs.midjourney.com/"
+      ]
+    },
+    {
+      "id": "adobe-firefly",
+      "name": "Adobe Firefly",
+      "developer": "Adobe",
+      "category": "Image generation",
+      "description": "Creative AI toolkit embedded in Adobe workflows for image generation, text effects, and content creation within creative tools.",
+      "website": "https://firefly.adobe.com",
+      "pricing_url": "https://www.adobe.com/products/firefly.html",
+      "pricing_summary": "Adobe offers a free tier and paid Firefly plans with generative credits; exact credits and access depend on the current product configuration and region.",
+      "pricing_currency": "USD",
+      "pricing_period": "monthly",
+      "last_verified": "2026-10-28",
+      "verification_status": "partial",
       "features": [
-        "Prompt-based image generation",
-        "Creative visual styles and iteration",
-        "Artwork concept exploration"
+        "Generative image creation",
+        "Text effects and design workflows",
+        "Creative-cloud integration",
+        "Adobe ecosystem compatibility"
       ],
-      "sources": [
-        { "label": "Midjourney official site", "url": "https://www.midjourney.com/" }
+      "limitations": [
+        "Credits and plan details can change over time",
+        "Some advanced capabilities require paid access",
+        "Usage and output quality depend on the prompt and current model version"
+      ],
+      "use_cases": [
+        "Marketing design",
+        "Text effects",
+        "Concept art",
+        "Creative workflow acceleration"
+      ],
+      "source_urls": [
+        "https://firefly.adobe.com",
+        "https://www.adobe.com/products/firefly.html",
+        "https://www.adobe.com/creativecloud/all-apps.html"
       ]
     },
     {
       "id": "notion-ai",
       "name": "Notion AI",
+      "developer": "Notion",
       "category": "Productivity",
-      "summary": "AI writing assistant integrated into documentation and workspace workflows.",
-      "best_for": "Notes, summaries, internal documentation, brainstorming",
-      "pricing_summary": "Usually tied to workspace plans; verification required on the official pricing page",
-      "availability": "Web and workspace integrations",
-      "last_verified": "2026-10-27",
+      "description": "AI productivity layer for drafting, summarization, and workspace assistance inside Notion documents and collaboration spaces.",
       "website": "https://www.notion.so/product/ai",
-      "strengths": [
-        "Well suited for internal knowledge work",
-        "Helpful for drafting notes and team documentation",
-        "Fits naturally into Notion-based workflows"
+      "pricing_url": "https://www.notion.so/pricing",
+      "pricing_summary": "Notion pricing pages describe AI add-ons and plan bundles; exact AI pricing can depend on workspace setup and billing terms.",
+      "pricing_currency": "USD",
+      "pricing_period": "monthly",
+      "last_verified": "2026-10-28",
+      "verification_status": "partial",
+      "features": [
+        "Workspace drafting and editing",
+        "Summaries and task extraction",
+        "Knowledge-base assistance",
+        "Team collaboration support"
       ],
       "limitations": [
-        "Dependent on workspace usage model",
-        "Not as specialized for deep technical coding tasks",
-        "Strongest when used inside an established documentation workflow"
+        "AI capabilities often depend on workspace plan",
+        "Best results require organized content and clear prompts",
+        "Exact pricing must be checked in the current Notion pricing page"
       ],
-      "features": [
-        "Workspace-embedded writing assistance",
-        "Summaries and content drafting",
-        "Team documentation support"
+      "use_cases": [
+        "Documentation drafting",
+        "Knowledge management",
+        "Project notes and summaries",
+        "Team writing workflows"
       ],
-      "sources": [
-        { "label": "Notion AI overview", "url": "https://www.notion.so/product/ai" }
+      "source_urls": [
+        "https://www.notion.so/product/ai",
+        "https://www.notion.so/pricing",
+        "https://www.notion.so/help/article/ai"
       ]
     },
     {
-      "id": "stable-diffusion",
-      "name": "Stable Diffusion",
-      "category": "Images",
-      "summary": "Open model ecosystem for generating images from text prompts and custom workflows.",
-      "best_for": "Local image generation, experimentation, model customization",
-      "pricing_summary": "Often free to use in open-source tooling; local hardware costs may apply",
-      "availability": "Open-source ecosystem, local or hosted apps",
-      "last_verified": "2026-10-27",
-      "website": "https://stability.ai",
-      "strengths": [
-        "Flexible and customizable",
-        "Strong open ecosystem and experimentation options",
-        "Useful for technical and creative image workflows"
+      "id": "canva-magic-studio",
+      "name": "Canva Magic Studio",
+      "developer": "Canva",
+      "category": "Design",
+      "description": "Design-focused AI workspace for presentations, social content, text generation, editing, and visual mockups.",
+      "website": "https://www.canva.com/magic-studio/",
+      "pricing_url": "https://www.canva.com/pricing/",
+      "pricing_summary": "Canva lists free and paid plans, with AI features often bundled into paid tiers or credit-based access; exact bundles vary by plan and region.",
+      "pricing_currency": "USD",
+      "pricing_period": "monthly",
+      "last_verified": "2026-10-28",
+      "verification_status": "partial",
+      "features": [
+        "Image generation and editing",
+        "Presentation and social design workflows",
+        "Text-generation assistance",
+        "Template-driven creative production"
       ],
       "limitations": [
-        "Hardware requirements can be significant for local use",
-        "User experience depends on the specific app or workflow",
-        "Quality varies across interfaces and model versions"
+        "AI feature access is tied to plan level",
+        "Some capabilities are more useful for quick marketing content than deep technical reasoning",
+        "Exact feature bundles should be checked on the pricing page"
       ],
+      "use_cases": [
+        "Presentation design",
+        "Marketing visuals",
+        "Social content",
+        "Quick creative mockups"
+      ],
+      "source_urls": [
+        "https://www.canva.com/magic-studio/",
+        "https://www.canva.com/pricing/",
+        "https://www.canva.com/help/"
+      ]
+    },
+    {
+      "id": "microsoft-copilot",
+      "name": "Microsoft Copilot",
+      "developer": "Microsoft",
+      "category": "Productivity",
+      "description": "AI productivity assistant integrated across Microsoft 365, web experiences, and enterprise workflows for writing, summarization, and task assistance.",
+      "website": "https://copilot.microsoft.com",
+      "pricing_url": "https://www.microsoft.com/en-us/microsoft-365/copilot",
+      "pricing_summary": "Microsoft official pages describe Copilot Pro and Microsoft 365 Copilot pricing; enterprise and business pricing is typically contract-based and may differ by seat and services included.",
+      "pricing_currency": "USD",
+      "pricing_period": "monthly or annual seat pricing",
+      "last_verified": "2026-10-28",
+      "verification_status": "partial",
       "features": [
-        "Text-to-image generation",
-        "Open model and custom pipeline support",
-        "Experimentation with image styles"
+        "Microsoft 365 integration",
+        "Writing and summarization",
+        "Task and workflow help",
+        "Enterprise and business deployment options"
       ],
-      "sources": [
-        { "label": "Stability AI", "url": "https://stability.ai" }
+      "limitations": [
+        "Business and enterprise pricing is often negotiated and varies by agreement",
+        "Feature availability depends on Microsoft 365 or Copilot plan",
+        "Some advanced capabilities are tied to enterprise licensing"
+      ],
+      "use_cases": [
+        "Enterprise productivity",
+        "Drafting and summarization",
+        "Workflow support",
+        "Sales and document assistance"
+      ],
+      "source_urls": [
+        "https://copilot.microsoft.com",
+        "https://www.microsoft.com/en-us/microsoft-365/copilot",
+        "https://www.microsoft.com/en-us/microsoft-365/business/microsoft-365-copilot"
       ]
     }
   ]
 }
+

@@ -111,11 +111,25 @@ h2 { font-size: clamp(1.85rem, 2vw, 2.5rem); }
 .tool-card h3 { font-size: 1.3rem; margin-bottom: 10px; }
 .tool-card p { color: var(--muted); margin: 0 0 14px; }
 .meta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.meta-row.compact-row { margin-bottom: 12px; }
 .meta-pill {
   display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px;
   border: 1px solid var(--border); border-radius: 999px; font-size: 0.75rem; color: var(--muted);
 }
+.status-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px; padding: 6px 10px; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.status-badge.verified { background: rgba(67, 217, 182, 0.12); color: #9af0d8; border: 1px solid rgba(67, 217, 182, 0.2); }
+.status-badge.partial { background: rgba(243, 201, 105, 0.12); color: var(--warning); border: 1px solid rgba(243, 201, 105, 0.2); }
+.status-badge.unverified { background: rgba(238, 125, 125, 0.1); color: #ffb2b2; border: 1px solid rgba(238, 125, 125, 0.2); }
 .tool-card .actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.source-stack {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+}
+.source-stack a, .sources a {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--border); color: var(--text); background: rgba(148, 163, 184, 0.04);
+}
 
 .chip-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
 .chip {
@@ -157,7 +171,6 @@ h2 { font-size: clamp(1.85rem, 2vw, 2.5rem); }
 .detail-card h3 { margin-bottom: 8px; color: var(--accent); font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; }
 .detail-card ul { margin: 0; padding-left: 18px; color: var(--muted); }
 .sources { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
-.sources a { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--border); color: var(--text); background: rgba(148, 163, 184, 0.04); }
 
 .error-panel {
   display: grid; gap: 12px; align-items: center;
@@ -181,3 +194,4 @@ h2 { font-size: clamp(1.85rem, 2vw, 2.5rem); }
   .main-nav { gap: 10px; }
   .tool-card .actions, .detail-header { flex-direction: column; align-items: flex-start; }
 }
+
