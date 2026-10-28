@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://skhm9.github.io/ai-compass/sitemap.xml

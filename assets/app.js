@@ -5,10 +5,35 @@
     return Array.isArray(value) ? value : [];
   }
 
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function normalizeStatus(value) {
     const status = (value || 'unverified').toLowerCase();
     if (['verified', 'partial', 'unverified'].includes(status)) return status;
     return 'unverified';
+  }
+
+  function toSafeExternalUrl(value, fallback = '#') {
+    if (typeof value !== 'string' || !value.trim()) return fallback;
+
+    try {
+      const parsed = new URL(value, window.location.href);
+      return ['http:', 'https:'].includes(parsed.protocol) ? parsed.toString() : fallback;
+    } catch (error) {
+      return fallback;
+    }
+  }
+
+  function resolveDataUrl(path) {
+    const cleanPath = String(path || '').replace(/^\.?\//, '');
+    return new URL(cleanPath, window.location.href).toString();
   }
 
   function fetchJson(path) {
@@ -16,7 +41,10 @@
       return Promise.resolve(DATA_CACHE.get(path));
     }
 
-    return fetch(`${window.location.origin}${window.location.pathname.includes('/ai-compass') ? '/ai-compass/' : '/'}${path.replace(/^\.\//, '')}`, { cache: 'force-cache' })
+    return fetch(resolveDataUrl(path), {
+      cache: 'force-cache',
+      headers: { Accept: 'application/json' }
+    })
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Failed to load ${path}: ${response.status}`);
@@ -29,41 +57,36 @@
       });
   }
 
-  function getRelativeAssetPath(path) {
-    if (path.startsWith('./')) return path.replace(/^\.\//, '');
-    return path;
-  }
-
   function renderStatusBadge(status) {
     const normalized = normalizeStatus(status);
-    return `<span class="status-badge ${normalized}">${normalized}</span>`;
+    return `<span class="status-badge ${normalized}">${escapeHtml(normalized)}</span>`;
   }
 
   function renderToolCard(tool) {
     const toolPrice = tool.pricing_summary || 'Price needs verification';
     const status = normalizeStatus(tool.verification_status);
     const sourceLinks = safeArray(tool.source_urls)
-      .map((url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">Source</a>`)
+      .map((url) => `<a href="${escapeHtml(toSafeExternalUrl(url, '#'))}" target="_blank" rel="noopener noreferrer">Source</a>`)
       .join('');
 
     return `
-      <article class="tool-card" aria-label="${tool.name}">
+      <article class="tool-card" aria-label="${escapeHtml(tool.name || 'Tool')}">
         <div class="tool-card-header">
-          <span class="tool-category">${tool.category || 'General'}</span>
+          <span class="tool-category">${escapeHtml(tool.category || 'General')}</span>
           ${renderStatusBadge(status)}
         </div>
-        <h3>${tool.name}</h3>
-        <p>${tool.description || 'Description not yet verified.'}</p>
+        <h3>${escapeHtml(tool.name || 'Unnamed tool')}</h3>
+        <p>${escapeHtml(tool.description || 'Description not yet verified.')}</p>
         <div class="meta-row">
-          <span class="meta-pill">Developer: ${tool.developer || 'Not verified'}</span>
-          <span class="meta-pill">Verified: ${tool.last_verified || 'Not recorded'}</span>
+          <span class="meta-pill">Developer: ${escapeHtml(tool.developer || 'Not verified')}</span>
+          <span class="meta-pill">Verified: ${escapeHtml(tool.last_verified || 'Not recorded')}</span>
         </div>
         <div class="meta-row compact-row">
-          <span class="meta-pill">Price: ${toolPrice}</span>
+          <span class="meta-pill">Price: ${escapeHtml(toolPrice)}</span>
         </div>
         <div class="actions">
-          <a class="button secondary" href="tool.html?id=${tool.id}">View details</a>
-          <a class="inline-link" href="${tool.website || '#'}" target="_blank" rel="noopener noreferrer">Official site →</a>
+          <a class="button secondary" href="${escapeHtml(`tool.html?id=${encodeURIComponent(tool.id || '')}`)}">View details</a>
+          <a class="inline-link" href="${escapeHtml(toSafeExternalUrl(tool.website, '#'))}" target="_blank" rel="noopener noreferrer">Official site →</a>
         </div>
         <div class="source-stack">${sourceLinks}</div>
       </article>
@@ -74,13 +97,13 @@
     return `
       <article class="news-card">
         <div class="news-card-header">
-          <span class="news-tag">${item.tag || 'Source'}</span>
-          <time datetime="${item.date || ''}">${item.date || 'Date unavailable'}</time>
+          <span class="news-tag">${escapeHtml(item.tag || 'Source')}</span>
+          <time datetime="${escapeHtml(item.date || '')}">${escapeHtml(item.date || 'Date unavailable')}</time>
         </div>
-        <h3>${item.title || 'Untitled update'}</h3>
-        <p>${item.summary || 'No summary provided.'}</p>
+        <h3>${escapeHtml(item.title || 'Untitled update')}</h3>
+        <p>${escapeHtml(item.summary || 'No summary provided.')}</p>
         <div class="sources">
-          <a href="${item.source_url}" target="_blank" rel="noopener noreferrer">Original source</a>
+          <a href="${escapeHtml(toSafeExternalUrl(item.source_url, '#'))}" target="_blank" rel="noopener noreferrer">Original source</a>
         </div>
       </article>
     `;
@@ -89,8 +112,8 @@
   function renderRetryBlock(message, onRetry, label = 'Retry') {
     return `
       <div class="error-panel" role="alert">
-        <p>${message}</p>
-        <button type="button" class="button primary retry-button" data-retry="${label}">${label}</button>
+        <p>${escapeHtml(message)}</p>
+        <button type="button" class="button primary retry-button" data-retry="${escapeHtml(label)}">${escapeHtml(label)}</button>
       </div>
     `;
   }
@@ -142,7 +165,7 @@
             container.innerHTML = `
               <div class="info-card">
                 <h3>No verified news available</h3>
-                <p>${data.empty_message || 'No verified updates are currently available for this dataset.'}</p>
+                <p>${escapeHtml(data.empty_message || 'No verified updates are currently available for this dataset.')}</p>
               </div>
             `;
             return;
@@ -188,7 +211,7 @@
           }
 
           filterWrap.innerHTML = categories.map((category) => `
-            <button type="button" class="chip ${category === activeFilter ? 'active' : ''}" data-category="${category}">${category}</button>
+            <button type="button" class="chip ${category === activeFilter ? 'active' : ''}" data-category="${escapeHtml(category)}">${escapeHtml(category)}</button>
           `).join('');
 
           filterWrap.querySelectorAll('.chip').forEach((button) => {
@@ -254,51 +277,51 @@
               <div class="detail-header">
                 <div>
                   <div class="detail-topline">
-                    <span class="tool-category">${tool.category || 'General'}</span>
+                    <span class="tool-category">${escapeHtml(tool.category || 'General')}</span>
                     ${renderStatusBadge(tool.verification_status)}
-                    <span class="meta-pill">Last verified: ${tool.last_verified || 'Not recorded'}</span>
+                    <span class="meta-pill">Last verified: ${escapeHtml(tool.last_verified || 'Not recorded')}</span>
                   </div>
-                  <h1>${tool.name}</h1>
-                  <p class="page-intro">${tool.description || 'Description not yet verified.'}</p>
+                  <h1>${escapeHtml(tool.name)}</h1>
+                  <p class="page-intro">${escapeHtml(tool.description || 'Description not yet verified.')}</p>
                 </div>
-                <a class="button primary" href="${tool.website || '#'}" target="_blank" rel="noopener noreferrer">Official site</a>
+                <a class="button primary" href="${escapeHtml(toSafeExternalUrl(tool.website, '#'))}" target="_blank" rel="noopener noreferrer">Official site</a>
               </div>
               <div class="detail-grid">
                 <div class="detail-card">
                   <h3>Developer</h3>
-                  <p>${tool.developer || 'Not verified'}</p>
+                  <p>${escapeHtml(tool.developer || 'Not verified')}</p>
                 </div>
                 <div class="detail-card">
                   <h3>Pricing</h3>
-                  <p>${tool.pricing_summary || 'Price needs verification'}</p>
+                  <p>${escapeHtml(tool.pricing_summary || 'Price needs verification')}</p>
                   <div class="sources">
-                    <a href="${tool.pricing_url || tool.website || '#'}" target="_blank" rel="noopener noreferrer">Pricing</a>
+                    <a href="${escapeHtml(toSafeExternalUrl(tool.pricing_url || tool.website, '#'))}" target="_blank" rel="noopener noreferrer">Pricing</a>
                   </div>
                 </div>
                 <div class="detail-card">
                   <h3>Verification</h3>
-                  <p>Verification state: ${normalizeStatus(tool.verification_status)}. Information should be checked against the official source before making claims about pricing, feature access, or availability.</p>
+                  <p>Verification state: ${escapeHtml(normalizeStatus(tool.verification_status))}. Information should be checked against the official source before making claims about pricing, feature access, or availability.</p>
                 </div>
               </div>
               <div class="detail-grid">
                 <div class="detail-card">
                   <h3>Primary use cases</h3>
-                  <ul>${useCases.length ? useCases.map((item) => `<li>${item}</li>`).join('') : '<li>Not recorded</li>'}</ul>
+                  <ul>${useCases.length ? useCases.map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li>Not recorded</li>'}</ul>
                 </div>
                 <div class="detail-card">
                   <h3>Features</h3>
-                  <ul>${features.length ? features.map((item) => `<li>${item}</li>`).join('') : '<li>Not recorded</li>'}</ul>
+                  <ul>${features.length ? features.map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li>Not recorded</li>'}</ul>
                 </div>
                 <div class="detail-card">
                   <h3>Known limitations</h3>
-                  <ul>${limitations.length ? limitations.map((item) => `<li>${item}</li>`).join('') : '<li>Not recorded</li>'}</ul>
+                  <ul>${limitations.length ? limitations.map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li>Not recorded</li>'}</ul>
                 </div>
               </div>
               <div class="detail-grid">
                 <div class="detail-card">
                   <h3>Official sources</h3>
                   <div class="sources">
-                    ${sources.length ? sources.map((url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">Source</a>`).join('') : '<span class="list-note">No sources listed.</span>'}
+                    ${sources.length ? sources.map((url) => `<a href="${escapeHtml(toSafeExternalUrl(url, '#'))}" target="_blank" rel="noopener noreferrer">Source</a>`).join('') : '<span class="list-note">No sources listed.</span>'}
                   </div>
                 </div>
               </div>
@@ -327,7 +350,7 @@
       fetchJson('data/tools.json')
         .then((data) => {
           const tools = safeArray(data.tools);
-          const options = ['<option value="">Select a tool</option>'].concat(tools.map((tool) => `<option value="${tool.id}">${tool.name}</option>`)).join('');
+          const options = ['<option value="">Select a tool</option>'].concat(tools.map((tool) => `<option value="${escapeHtml(tool.id || '')}">${escapeHtml(tool.name || 'Unnamed tool')}</option>`)).join('');
 
           selectOne.innerHTML = options;
           selectTwo.innerHTML = options;
@@ -368,14 +391,14 @@
                 <thead>
                   <tr>
                     <th>Field</th>
-                    ${selected.map((tool) => `<th>${tool.name}</th>`).join('')}
+                    ${selected.map((tool) => `<th>${escapeHtml(tool.name || 'Unnamed tool')}</th>`).join('')}
                   </tr>
                 </thead>
                 <tbody>
                   ${rows.map(([label, getter]) => `
                     <tr>
-                      <td>${label}</td>
-                      ${selected.map((tool) => `<td>${getter(tool)}</td>`).join('')}
+                      <td>${escapeHtml(label)}</td>
+                      ${selected.map((tool) => `<td>${escapeHtml(getter(tool))}</td>`).join('')}
                     </tr>
                   `).join('')}
                 </tbody>
@@ -411,7 +434,7 @@
             container.innerHTML = `
               <div class="info-card">
                 <h3>No verified news available</h3>
-                <p>${data.empty_message || 'No verified updates are currently available for this dataset.'}</p>
+                <p>${escapeHtml(data.empty_message || 'No verified updates are currently available for this dataset.')}</p>
               </div>
             `;
             return;
@@ -441,4 +464,3 @@
     initNewsPage,
   };
 })();
-
