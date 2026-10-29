@@ -20,20 +20,12 @@
     return 'unverified';
   }
 
-  function toSafeExternalUrl(value, fallback = '#') {
-    if (typeof value !== 'string' || !value.trim()) return fallback;
-
-    try {
-      const parsed = new URL(value, window.location.href);
-      return ['http:', 'https:'].includes(parsed.protocol) ? parsed.toString() : fallback;
-    } catch (error) {
-      return fallback;
-    }
-  }
-
   function resolveDataUrl(path) {
     const cleanPath = String(path || '').replace(/^\.?\//, '');
-    return new URL(cleanPath, window.location.href).toString();
+    const currentLocation = new URL(window.location.href);
+    const pathName = currentLocation.pathname.replace(/\/+$/, '');
+    const basePath = pathName.endsWith('/ai-compass') ? '/ai-compass/' : '/';
+    return new URL(cleanPath, `${currentLocation.origin}${basePath}`).toString();
   }
 
   function fetchJson(path) {
@@ -57,129 +49,186 @@
       });
   }
 
-  function renderStatusBadge(status) {
-    const normalized = normalizeStatus(status);
-    return `<span class="status-badge ${normalized}">${escapeHtml(normalized)}</span>`;
+  function buildCategoryPills(categories) {
+    const container = document.getElementById('home-category-pills');
+    if (!container) return;
+
+    const chips = (categories || []).slice(0, 7).map((category) => `
+      <button type="button" class="chip-pill" data-category="${escapeHtml(category)}">${escapeHtml(category)}</button>
+    `).join('');
+
+    container.innerHTML = chips || '<span class="chip-pill muted-chip">No categories available</span>';
+
+    container.querySelectorAll('.chip-pill[data-category]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const category = button.dataset.category;
+        window.location.href = `tools.html?category=${encodeURIComponent(category)}`;
+      });
+    });
   }
 
-  function renderToolCard(tool) {
-    const toolPrice = tool.pricing_summary || 'Price needs verification';
-    const status = normalizeStatus(tool.verification_status);
-    const sourceLinks = safeArray(tool.source_urls)
-      .map((url) => `<a href="${escapeHtml(toSafeExternalUrl(url, '#'))}" target="_blank" rel="noopener noreferrer">Source</a>`)
-      .join('');
+  function renderMetricCards(summary) {
+    const container = document.getElementById('dashboard-metrics');
+    if (!container) return;
 
-    return `
-      <article class="tool-card" aria-label="${escapeHtml(tool.name || 'Tool')}">
-        <div class="tool-card-header">
-          <span class="tool-category">${escapeHtml(tool.category || 'General')}</span>
-          ${renderStatusBadge(status)}
-        </div>
-        <h3>${escapeHtml(tool.name || 'Unnamed tool')}</h3>
-        <p>${escapeHtml(tool.description || 'Description not yet verified.')}</p>
-        <div class="meta-row">
-          <span class="meta-pill">Developer: ${escapeHtml(tool.developer || 'Not verified')}</span>
-          <span class="meta-pill">Verified: ${escapeHtml(tool.last_verified || 'Not recorded')}</span>
-        </div>
-        <div class="meta-row compact-row">
-          <span class="meta-pill">Price: ${escapeHtml(toolPrice)}</span>
-        </div>
-        <div class="actions">
-          <a class="button secondary" href="${escapeHtml(`tool.html?id=${encodeURIComponent(tool.id || '')}`)}">View details</a>
-          <a class="inline-link" href="${escapeHtml(toSafeExternalUrl(tool.website, '#'))}" target="_blank" rel="noopener noreferrer">Official site →</a>
-        </div>
-        <div class="source-stack">${sourceLinks}</div>
+    const cards = [
+      {
+        label: 'Tools tracked',
+        value: summary.totalTools,
+        detail: 'static catalog',
+        tone: 'purple'
+      },
+      {
+        label: 'Categories',
+        value: summary.totalCategories,
+        detail: 'tracked tools',
+        tone: 'cyan'
+      },
+      {
+        label: 'Verification',
+        value: `${summary.verifiedCount}`,
+        detail: 'verified records',
+        tone: 'pink'
+      },
+      {
+        label: 'Partial',
+        value: `${summary.partialCount}`,
+        detail: 'needs review',
+        tone: 'teal'
+      }
+    ];
+
+    container.innerHTML = cards.map((card) => `
+      <article class="metric-card ${card.tone}">
+        <span class="metric-label">${escapeHtml(card.label)}</span>
+        <strong class="metric-value">${escapeHtml(card.value)}</strong>
+        <small>${escapeHtml(card.detail)}</small>
       </article>
-    `;
+    `).join('');
   }
 
-  function renderNewsCard(item) {
-    return `
-      <article class="news-card">
-        <div class="news-card-header">
+  function renderTopTools(tools) {
+    const container = document.getElementById('top-tools');
+    if (!container) return;
+
+    const entries = tools.slice(0, 5);
+
+    container.innerHTML = entries.map((tool) => {
+      const status = normalizeStatus(tool.verification_status);
+      return `
+        <article class="tool-row">
+          <div class="tool-row-main">
+            <div class="tool-row-mark">${escapeHtml((tool.name || 'AI').slice(0, 2).toUpperCase())}</div>
+            <div>
+              <h3>${escapeHtml(tool.name || 'Unnamed tool')}</h3>
+              <p>${escapeHtml(tool.description || 'Description not yet verified.')}</p>
+            </div>
+          </div>
+          <div class="tool-row-meta">
+            <span class="status-pill ${status}">${escapeHtml(status)}</span>
+            <a href="tool.html?id=${encodeURIComponent(tool.id || '')}" aria-label="View ${escapeHtml(tool.name || 'tool')} details">→</a>
+          </div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  function renderNewsPanel(newsData) {
+    const container = document.getElementById('dashboard-news');
+    if (!container) return;
+
+    const items = safeArray(newsData.news).slice(0, 4);
+
+    if (!items.length) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <h3>No verified news available</h3>
+          <p>${escapeHtml(newsData.empty_message || 'No verified updates are currently available for this dataset.')}</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = items.map((item) => `
+      <article class="news-item">
+        <div class="news-item-top">
           <span class="news-tag">${escapeHtml(item.tag || 'Source')}</span>
-          <time datetime="${escapeHtml(item.date || '')}">${escapeHtml(item.date || 'Date unavailable')}</time>
+          <time>${escapeHtml(item.date || 'Date unavailable')}</time>
         </div>
         <h3>${escapeHtml(item.title || 'Untitled update')}</h3>
         <p>${escapeHtml(item.summary || 'No summary provided.')}</p>
-        <div class="sources">
-          <a href="${escapeHtml(toSafeExternalUrl(item.source_url, '#'))}" target="_blank" rel="noopener noreferrer">Original source</a>
-        </div>
+        <a href="${escapeHtml(item.source_url || '#')}" target="_blank" rel="noopener noreferrer">Original source</a>
       </article>
-    `;
+    `).join('');
   }
 
-  function renderRetryBlock(message, onRetry, label = 'Retry') {
-    return `
-      <div class="error-panel" role="alert">
-        <p>${escapeHtml(message)}</p>
-        <button type="button" class="button primary retry-button" data-retry="${escapeHtml(label)}">${escapeHtml(label)}</button>
-      </div>
-    `;
-  }
+  function initDashboard() {
+    const topSearchInput = document.getElementById('top-search-input');
+    const heroSearchInput = document.getElementById('hero-search-input');
+    const mobileToggle = document.getElementById('mobile-toggle');
+    const sidebar = document.getElementById('sidebar');
 
-  function attachRetryHandlers(container, retryFn) {
-    const button = container.querySelector('.retry-button');
-    if (button) {
-      button.addEventListener('click', retryFn);
+    if (mobileToggle && sidebar) {
+      mobileToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
     }
-  }
 
-  function populateFeaturedTools() {
-    const featuredContainer = document.getElementById('featured-tools');
-    if (!featuredContainer) return;
-
-    const load = () => {
-      fetchJson('data/tools.json')
-        .then((data) => {
-          const tools = safeArray(data.tools).slice(0, 4);
-          featuredContainer.innerHTML = tools.map(renderToolCard).join('');
-
-          const count = document.querySelector('[data-home-stat="count"]');
-          const categories = document.querySelector('[data-home-stat="categories"]');
-          if (count) count.textContent = String(safeArray(data.tools).length);
-          if (categories) {
-            const uniqueCategories = new Set(safeArray(data.tools).map((tool) => tool.category).filter(Boolean));
-            categories.textContent = String(uniqueCategories.size);
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          featuredContainer.innerHTML = renderRetryBlock('Unable to load the featured tools right now.', load, 'Retry tools');
-          attachRetryHandlers(featuredContainer, load);
-        });
+    const handleSearch = (query) => {
+      const normalized = (query || '').trim();
+      if (!normalized) return;
+      window.location.href = `tools.html?q=${encodeURIComponent(normalized)}`;
     };
 
-    load();
-  }
+    if (topSearchInput) {
+      topSearchInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          handleSearch(topSearchInput.value);
+        }
+      });
+    }
 
-  function populateFeaturedNews() {
-    const container = document.getElementById('featured-news');
-    if (!container) return;
+    if (heroSearchInput) {
+      heroSearchInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          handleSearch(heroSearchInput.value);
+        }
+      });
+    }
 
-    const load = () => {
-      fetchJson('data/news.json')
-        .then((data) => {
-          const items = safeArray(data.news).slice(0, 3);
-          if (!items.length) {
-            container.innerHTML = `
-              <div class="info-card">
-                <h3>No verified news available</h3>
-                <p>${escapeHtml(data.empty_message || 'No verified updates are currently available for this dataset.')}</p>
-              </div>
-            `;
-            return;
-          }
-          container.innerHTML = items.map(renderNewsCard).join('');
-        })
-        .catch((error) => {
-          console.error(error);
-          container.innerHTML = renderRetryBlock('Unable to load the latest AI news right now.', load, 'Retry news');
-          attachRetryHandlers(container, load);
-        });
-    };
+    fetchJson('data/tools.json')
+      .then((toolData) => {
+        const tools = safeArray(toolData.tools);
+        const categories = [...new Set(tools.map((tool) => tool.category).filter(Boolean))];
+        const summary = {
+          totalTools: tools.length,
+          totalCategories: categories.length,
+          verifiedCount: tools.filter((tool) => normalizeStatus(tool.verification_status) === 'verified').length,
+          partialCount: tools.filter((tool) => normalizeStatus(tool.verification_status) === 'partial').length,
+        };
 
-    load();
+        buildCategoryPills(categories);
+        renderMetricCards(summary);
+        renderTopTools(tools);
+      })
+      .catch((error) => {
+        console.error(error);
+        document.getElementById('dashboard-metrics').innerHTML = `
+          <article class="metric-card purple"><span class="metric-label">Tools tracked</span><strong class="metric-value">Unavailable</strong><small>Data not available</small></article>
+        `;
+      });
+
+    fetchJson('data/news.json')
+      .then((newsData) => renderNewsPanel(newsData))
+      .catch((error) => {
+        console.error(error);
+        const container = document.getElementById('dashboard-news');
+        if (container) {
+          container.innerHTML = '<div class="empty-state"><h3>News unavailable</h3><p>Unable to load verified AI news data.</p></div>';
+        }
+      });
   }
 
   function initToolsPage() {
@@ -189,13 +238,21 @@
 
     if (!list) return;
 
+    const url = new URL(window.location.href);
+    const initialQuery = url.searchParams.get('q') || '';
+    const initialCategory = url.searchParams.get('category') || 'All';
+
     const load = () => {
       fetchJson('data/tools.json')
         .then((data) => {
           const tools = safeArray(data.tools);
           const categories = ['All', ...new Set(tools.map((tool) => tool.category).filter(Boolean))];
-          let activeFilter = 'All';
-          let query = '';
+          let activeFilter = categories.includes(initialCategory) ? initialCategory : 'All';
+          let query = initialQuery;
+
+          if (searchInput) {
+            searchInput.value = query;
+          }
 
           function renderTools() {
             const filtered = tools.filter((tool) => {
@@ -206,23 +263,42 @@
             });
 
             list.innerHTML = filtered.length
-              ? filtered.map(renderToolCard).join('')
+              ? filtered.map((tool) => `
+                <article class="tool-card">
+                  <div class="tool-card-header">
+                    <span class="tool-category">${escapeHtml(tool.category || 'General')}</span>
+                    <span class="status-badge ${normalizeStatus(tool.verification_status)}">${escapeHtml(normalizeStatus(tool.verification_status))}</span>
+                  </div>
+                  <h3>${escapeHtml(tool.name || 'Unnamed tool')}</h3>
+                  <p>${escapeHtml(tool.description || 'Description not yet verified.')}</p>
+                  <div class="meta-row">
+                    <span class="meta-pill">Developer: ${escapeHtml(tool.developer || 'Not verified')}</span>
+                    <span class="meta-pill">Verified: ${escapeHtml(tool.last_verified || 'Not recorded')}</span>
+                  </div>
+                  <div class="actions">
+                    <a class="button secondary" href="tool.html?id=${encodeURIComponent(tool.id || '')}">View details</a>
+                    <a class="inline-link" href="${escapeHtml(tool.website || '#')}" target="_blank" rel="noopener noreferrer">Official site →</a>
+                  </div>
+                </article>
+              `).join('')
               : '<p class="list-note">No tools match your current filters.</p>';
           }
 
-          filterWrap.innerHTML = categories.map((category) => `
-            <button type="button" class="chip ${category === activeFilter ? 'active' : ''}" data-category="${escapeHtml(category)}">${escapeHtml(category)}</button>
-          `).join('');
+          if (filterWrap) {
+            filterWrap.innerHTML = categories.map((category) => `
+              <button type="button" class="chip ${category === activeFilter ? 'active' : ''}" data-category="${escapeHtml(category)}">${escapeHtml(category)}</button>
+            `).join('');
 
-          filterWrap.querySelectorAll('.chip').forEach((button) => {
-            button.addEventListener('click', () => {
-              activeFilter = button.dataset.category;
-              renderTools();
-              filterWrap.querySelectorAll('.chip').forEach((chip) => {
-                chip.classList.toggle('active', chip.dataset.category === activeFilter);
+            filterWrap.querySelectorAll('.chip').forEach((button) => {
+              button.addEventListener('click', () => {
+                activeFilter = button.dataset.category;
+                renderTools();
+                filterWrap.querySelectorAll('.chip').forEach((chip) => {
+                  chip.classList.toggle('active', chip.dataset.category === activeFilter);
+                });
               });
             });
-          });
+          }
 
           if (searchInput) {
             searchInput.addEventListener('input', (event) => {
@@ -235,8 +311,7 @@
         })
         .catch((error) => {
           console.error(error);
-          list.innerHTML = renderRetryBlock('Unable to load the tools catalog right now. Please retry.', load, 'Retry catalog');
-          attachRetryHandlers(list, load);
+          list.innerHTML = '<p class="list-note">Unable to load the tools catalog right now.</p>';
         });
     };
 
@@ -250,217 +325,116 @@
     const params = new URLSearchParams(window.location.search);
     const toolId = params.get('id');
 
-    const load = () => {
-      fetchJson('data/tools.json')
-        .then((data) => {
-          const tools = safeArray(data.tools);
-          const tool = tools.find((entry) => entry.id === toolId);
+    fetchJson('data/tools.json')
+      .then((data) => {
+        const tools = safeArray(data.tools);
+        const tool = tools.find((entry) => entry.id === toolId);
 
-          if (!tool) {
-            container.innerHTML = `
-              <div class="detail-panel">
-                <h1>Tool not found</h1>
-                <p class="list-note">The requested AI tool is not available in the current dataset.</p>
-                <a class="button primary" href="tools.html">Back to tools</a>
-              </div>
-            `;
-            return;
-          }
-
-          const features = safeArray(tool.features);
-          const limitations = safeArray(tool.limitations);
-          const useCases = safeArray(tool.use_cases);
-          const sources = safeArray(tool.source_urls);
-
+        if (!tool) {
           container.innerHTML = `
-            <article class="detail-panel">
-              <div class="detail-header">
-                <div>
-                  <div class="detail-topline">
-                    <span class="tool-category">${escapeHtml(tool.category || 'General')}</span>
-                    ${renderStatusBadge(tool.verification_status)}
-                    <span class="meta-pill">Last verified: ${escapeHtml(tool.last_verified || 'Not recorded')}</span>
-                  </div>
-                  <h1>${escapeHtml(tool.name)}</h1>
-                  <p class="page-intro">${escapeHtml(tool.description || 'Description not yet verified.')}</p>
-                </div>
-                <a class="button primary" href="${escapeHtml(toSafeExternalUrl(tool.website, '#'))}" target="_blank" rel="noopener noreferrer">Official site</a>
-              </div>
-              <div class="detail-grid">
-                <div class="detail-card">
-                  <h3>Developer</h3>
-                  <p>${escapeHtml(tool.developer || 'Not verified')}</p>
-                </div>
-                <div class="detail-card">
-                  <h3>Pricing</h3>
-                  <p>${escapeHtml(tool.pricing_summary || 'Price needs verification')}</p>
-                  <div class="sources">
-                    <a href="${escapeHtml(toSafeExternalUrl(tool.pricing_url || tool.website, '#'))}" target="_blank" rel="noopener noreferrer">Pricing</a>
-                  </div>
-                </div>
-                <div class="detail-card">
-                  <h3>Verification</h3>
-                  <p>Verification state: ${escapeHtml(normalizeStatus(tool.verification_status))}. Information should be checked against the official source before making claims about pricing, feature access, or availability.</p>
-                </div>
-              </div>
-              <div class="detail-grid">
-                <div class="detail-card">
-                  <h3>Primary use cases</h3>
-                  <ul>${useCases.length ? useCases.map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li>Not recorded</li>'}</ul>
-                </div>
-                <div class="detail-card">
-                  <h3>Features</h3>
-                  <ul>${features.length ? features.map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li>Not recorded</li>'}</ul>
-                </div>
-                <div class="detail-card">
-                  <h3>Known limitations</h3>
-                  <ul>${limitations.length ? limitations.map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li>Not recorded</li>'}</ul>
-                </div>
-              </div>
-              <div class="detail-grid">
-                <div class="detail-card">
-                  <h3>Official sources</h3>
-                  <div class="sources">
-                    ${sources.length ? sources.map((url) => `<a href="${escapeHtml(toSafeExternalUrl(url, '#'))}" target="_blank" rel="noopener noreferrer">Source</a>`).join('') : '<span class="list-note">No sources listed.</span>'}
-                  </div>
-                </div>
-              </div>
-            </article>
+            <div class="detail-panel">
+              <h1>Tool not found</h1>
+              <p class="list-note">The requested tool is not available in the current dataset.</p>
+              <a class="button primary" href="tools.html">Back to tools</a>
+            </div>
           `;
-        })
-        .catch((error) => {
-          console.error(error);
-          container.innerHTML = renderRetryBlock('Unable to load this tool detail right now.', load, 'Retry details');
-          attachRetryHandlers(container, load);
-        });
-    };
+          return;
+        }
 
-    load();
-  }
-
-  function initComparisonPage() {
-    const selectOne = document.getElementById('compare-tool-1');
-    const selectTwo = document.getElementById('compare-tool-2');
-    const selectThree = document.getElementById('compare-tool-3');
-    const output = document.getElementById('compare-output');
-
-    if (!output || !selectOne || !selectTwo || !selectThree) return;
-
-    const load = () => {
-      fetchJson('data/tools.json')
-        .then((data) => {
-          const tools = safeArray(data.tools);
-          const options = ['<option value="">Select a tool</option>'].concat(tools.map((tool) => `<option value="${escapeHtml(tool.id || '')}">${escapeHtml(tool.name || 'Unnamed tool')}</option>`)).join('');
-
-          selectOne.innerHTML = options;
-          selectTwo.innerHTML = options;
-          selectThree.innerHTML = options;
-
-          const defaultOptions = ['chatgpt', 'claude', 'gemini'];
-          [selectOne, selectTwo, selectThree].forEach((select, index) => {
-            if (defaultOptions[index]) select.value = defaultOptions[index];
-          });
-
-          function getSelectedTools() {
-            return [selectOne.value, selectTwo.value, selectThree.value]
-              .filter(Boolean)
-              .map((id) => tools.find((tool) => tool.id === id))
-              .filter(Boolean);
-          }
-
-          function renderComparison() {
-            const selected = getSelectedTools();
-            if (!selected.length) {
-              output.innerHTML = '<p class="list-note">Select one or more tools to compare.</p>';
-              return;
-            }
-
-            const rows = [
-              ['Developer', (tool) => tool.developer || 'Not verified'],
-              ['Category', (tool) => tool.category || 'Not verified'],
-              ['Pricing', (tool) => tool.pricing_summary || 'Price needs verification'],
-              ['Verification state', (tool) => normalizeStatus(tool.verification_status)],
-              ['Last verified', (tool) => tool.last_verified || 'Not recorded'],
-              ['Features', (tool) => safeArray(tool.features).join('; ') || 'Not recorded'],
-              ['Limitations', (tool) => safeArray(tool.limitations).join('; ') || 'Not recorded'],
-              ['Use cases', (tool) => safeArray(tool.use_cases).join('; ') || 'Not recorded']
-            ];
-
-            output.innerHTML = `
-              <table class="compare-table">
-                <thead>
-                  <tr>
-                    <th>Field</th>
-                    ${selected.map((tool) => `<th>${escapeHtml(tool.name || 'Unnamed tool')}</th>`).join('')}
-                  </tr>
-                </thead>
-                <tbody>
-                  ${rows.map(([label, getter]) => `
-                    <tr>
-                      <td>${escapeHtml(label)}</td>
-                      ${selected.map((tool) => `<td>${escapeHtml(getter(tool))}</td>`).join('')}
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            `;
-          }
-
-          [selectOne, selectTwo, selectThree].forEach((select) => {
-            select.addEventListener('change', renderComparison);
-          });
-
-          renderComparison();
-        })
-        .catch((error) => {
-          console.error(error);
-          output.innerHTML = renderRetryBlock('Unable to load the comparison data right now.', load, 'Retry comparison');
-          attachRetryHandlers(output, load);
-        });
-    };
-
-    load();
+        container.innerHTML = `
+          <article class="detail-panel">
+            <div class="detail-header">
+              <div>
+                <div class="detail-topline">
+                  <span class="tool-category">${escapeHtml(tool.category || 'General')}</span>
+                  <span class="status-badge ${normalizeStatus(tool.verification_status)}">${escapeHtml(normalizeStatus(tool.verification_status))}</span>
+                  <span class="meta-pill">Last verified: ${escapeHtml(tool.last_verified || 'Not recorded')}</span>
+                </div>
+                <h1>${escapeHtml(tool.name || 'Unnamed tool')}</h1>
+                <p class="page-intro">${escapeHtml(tool.description || 'Description not yet verified.')}</p>
+              </div>
+              <a class="button primary" href="${escapeHtml(tool.website || '#')}" target="_blank" rel="noopener noreferrer">Official site</a>
+            </div>
+            <div class="detail-grid">
+              <div class="detail-card">
+                <h3>Developer</h3>
+                <p>${escapeHtml(tool.developer || 'Not verified')}</p>
+              </div>
+              <div class="detail-card">
+                <h3>Pricing</h3>
+                <p>${escapeHtml(tool.pricing_summary || 'Price needs verification')}</p>
+              </div>
+              <div class="detail-card">
+                <h3>Verification</h3>
+                <p>Verification state: ${escapeHtml(normalizeStatus(tool.verification_status))}. Information should be checked against official sources before making strong claims.</p>
+              </div>
+            </div>
+            <div class="detail-grid">
+              <div class="detail-card">
+                <h3>Primary use cases</h3>
+                <ul>${safeArray(tool.use_cases).length ? safeArray(tool.use_cases).map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li>Not recorded</li>'}</ul>
+              </div>
+              <div class="detail-card">
+                <h3>Features</h3>
+                <ul>${safeArray(tool.features).length ? safeArray(tool.features).map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li>Not recorded</li>'}</ul>
+              </div>
+              <div class="detail-card">
+                <h3>Known limitations</h3>
+                <ul>${safeArray(tool.limitations).length ? safeArray(tool.limitations).map((item) => `<li>${escapeHtml(item)}</li>`).join('') : '<li>Not recorded</li>'}</ul>
+              </div>
+            </div>
+          </article>
+        `;
+      })
+      .catch((error) => {
+        console.error(error);
+        container.innerHTML = '<p class="list-note">Unable to load this tool detail right now.</p>';
+      });
   }
 
   function initNewsPage() {
     const container = document.getElementById('news-list');
     if (!container) return;
 
-    const load = () => {
-      fetchJson('data/news.json')
-        .then((data) => {
-          const items = safeArray(data.news);
-          if (!items.length) {
-            container.innerHTML = `
-              <div class="info-card">
-                <h3>No verified news available</h3>
-                <p>${escapeHtml(data.empty_message || 'No verified updates are currently available for this dataset.')}</p>
-              </div>
-            `;
-            return;
-          }
-          container.innerHTML = items.map(renderNewsCard).join('');
-        })
-        .catch((error) => {
-          console.error(error);
-          container.innerHTML = renderRetryBlock('Unable to load the news feed right now.', load, 'Retry news');
-          attachRetryHandlers(container, load);
-        });
-    };
+    fetchJson('data/news.json')
+      .then((data) => {
+        const items = safeArray(data.news);
+        if (!items.length) {
+          container.innerHTML = `
+            <div class="info-card">
+              <h3>No verified news available</h3>
+              <p>${escapeHtml(data.empty_message || 'No verified updates are currently available for this dataset.')}</p>
+            </div>
+          `;
+          return;
+        }
 
-    load();
+        container.innerHTML = items.map((item) => `
+          <article class="news-card">
+            <div class="news-card-header">
+              <span class="news-tag">${escapeHtml(item.tag || 'Source')}</span>
+              <time datetime="${escapeHtml(item.date || '')}">${escapeHtml(item.date || 'Date unavailable')}</time>
+            </div>
+            <h3>${escapeHtml(item.title || 'Untitled update')}</h3>
+            <p>${escapeHtml(item.summary || 'No summary provided.')}</p>
+            <a href="${escapeHtml(item.source_url || '#')}" target="_blank" rel="noopener noreferrer">Original source</a>
+          </article>
+        `).join('');
+      })
+      .catch((error) => {
+        console.error(error);
+        container.innerHTML = '<p class="list-note">Unable to load AI news at the moment.</p>';
+      });
   }
 
   function initHome() {
-    populateFeaturedTools();
-    populateFeaturedNews();
+    initDashboard();
   }
 
   window.aiCompassApp = {
     initHome,
     initToolsPage,
     initToolDetailPage,
-    initComparisonPage,
     initNewsPage,
   };
 })();

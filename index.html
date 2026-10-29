@@ -5,130 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="AI Compass helps you discover, compare, and evaluate AI tools with clear data, pricing context, and source links."
+      content="AI Compass dashboard for discovering, comparing, and evaluating AI tools with source-backed context."
     />
     <meta name="robots" content="index,follow" />
-    <meta
-      name="keywords"
-      content="AI tools, AI comparison, AI discovery, AI news, chatbots, AI research tools, AI coding assistants"
-    />
     <title>AI Compass | Discover Better AI Tools</title>
     <link rel="canonical" href="https://skhm9.github.io/ai-compass/" />
     <link rel="stylesheet" href="assets/styles.css" />
     <script src="assets/app.js" defer></script>
   </head>
-  <body>
-    <header class="site-header">
-      <div class="container nav-shell">
-        <a href="index.html" class="brand" aria-label="AI Compass home">✦ AI Compass</a>
-        <nav class="main-nav" aria-label="Main navigation">
-          <a href="index.html" class="active">Home</a>
-          <a href="tools.html">Tools</a>
-          <a href="comparison.html">Compare</a>
-          <a href="news.html">News</a>
+  <body class="dashboard-shell">
+    <div class="app-frame">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand-wrap">
+          <div class="brand-mark">✦</div>
+          <div class="brand-copy">
+            <div class="brand-name">AI Compass</div>
+            <div class="brand-tag">AI Discovery Intelligence</div>
+          </div>
+        </div>
+
+        <nav class="side-nav" aria-label="Main navigation">
+          <a href="index.html" class="nav-item active">
+            <span class="nav-icon">⌂</span>
+            <span>Home</span>
+          </a>
+          <a href="tools.html" class="nav-item">
+            <span class="nav-icon">✦</span>
+            <span>AI Tools</span>
+          </a>
+          <a href="tools.html" class="nav-item">
+            <span class="nav-icon">▣</span>
+            <span>Categories</span>
+          </a>
+          <a href="news.html" class="nav-item">
+            <span class="nav-icon">◫</span>
+            <span>Latest News</span>
+          </a>
+          <a href="tools.html" class="nav-item">
+            <span class="nav-icon">↗</span>
+            <span>Trending</span>
+          </a>
+          <a href="tools.html" class="nav-item">
+            <span class="nav-icon">♥</span>
+            <span>My Favorites</span>
+          </a>
+          <a href="tools.html" class="nav-item">
+            <span class="nav-icon">⚙</span>
+            <span>Settings</span>
+          </a>
         </nav>
+
+        <div class="sidebar-footer">
+          <div class="sidebar-badge">AI Compass</div>
+          <p>Better tools. Smarter choices. Real results.</p>
+        </div>
+      </aside>
+
+      <div class="main-panel">
+        <header class="topbar">
+          <button class="mobile-toggle" id="mobile-toggle" type="button" aria-label="Open navigation">
+            ☰
+          </button>
+
+          <label class="top-search" for="top-search-input">
+            <span class="search-icon">⌕</span>
+            <input id="top-search-input" type="search" placeholder="Search AI tools, categories, or tasks..." aria-label="Search AI tools" />
+          </label>
+
+          <div class="user-chip">
+            <div class="user-avatar">A</div>
+            <div class="user-meta">
+              <strong>Alex Morgan</strong>
+              <span>Explorer</span>
+            </div>
+          </div>
+        </header>
+
+        <main class="dashboard-main">
+          <section class="hero-block panel">
+            <div class="hero-copy">
+              <span class="eyebrow">DISCOVER INTELLIGENCE</span>
+              <h1>Welcome back, Alex</h1>
+              <p>Find the right AI tools, stay updated with the latest news, and turn ideas into real results.</p>
+
+              <form id="hero-search-form" class="hero-search" action="tools.html" method="GET">
+                <label class="hero-search-field">
+                  <span class="search-icon">⌕</span>
+                  <input id="hero-search-input" name="q" type="search" placeholder="Search AI tools, categories, or tasks..." aria-label="Search AI tools and categories" />
+                </label>
+                <button type="submit" class="hero-search-button" aria-label="Search tools">→</button>
+              </form>
+
+              <div id="home-category-pills" class="chip-row" aria-label="Quick categories"></div>
+            </div>
+
+            <div class="hero-graphic" aria-hidden="true">
+              <div class="compass-outer">
+                <div class="compass-inner">
+                  <div class="compass-center"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="dashboard-metrics" class="metric-grid" aria-live="polite"></section>
+
+          <section class="content-grid">
+            <div class="panel panel-list">
+              <div class="section-header">
+                <div class="section-title-wrap">
+                  <span class="section-mark">✦</span>
+                  <h2>Top Tools</h2>
+                </div>
+                <a href="tools.html" class="section-link">View all</a>
+              </div>
+              <div id="top-tools" class="tool-list" aria-live="polite"></div>
+            </div>
+
+            <div class="panel panel-list news-panel">
+              <div class="section-header">
+                <div class="section-title-wrap">
+                  <span class="section-mark">◉</span>
+                  <h2>Latest AI News</h2>
+                </div>
+                <a href="news.html" class="section-link">View all</a>
+              </div>
+              <div id="dashboard-news" class="news-list" aria-live="polite"></div>
+            </div>
+          </section>
+        </main>
       </div>
-    </header>
-
-    <main>
-      <section class="hero">
-        <div class="container hero-inner">
-          <div class="hero-copy">
-            <span class="eyebrow">AI discovery platform</span>
-            <h1>Discover the right AI tool for the job.</h1>
-            <p>
-              Compare writing tools, coding copilots, research assistants, and image generators with
-              verified source links, pricing context, and clear strengths and trade-offs.
-            </p>
-            <div class="hero-actions">
-              <a class="button primary" href="tools.html">Explore tools</a>
-              <a class="button secondary" href="comparison.html">Compare tools</a>
-            </div>
-          </div>
-          <div class="hero-panel" aria-label="Overview stats">
-            <div class="stat-card">
-              <strong data-home-stat="count">0</strong>
-              <span>Tools tracked</span>
-            </div>
-            <div class="stat-card">
-              <strong data-home-stat="categories">0</strong>
-              <span>Categories</span>
-            </div>
-            <div class="stat-card">
-              <strong>Manual</strong>
-              <span>Source-based updates</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="container">
-          <div class="section-head">
-            <div>
-              <span class="eyebrow">Featured tools</span>
-              <h2>Popular AI tools</h2>
-            </div>
-            <a href="tools.html" class="inline-link">View all tools →</a>
-          </div>
-          <div id="featured-tools" class="tool-grid" aria-live="polite"></div>
-        </div>
-      </section>
-
-      <section class="section alt-section">
-        <div class="container">
-          <div class="section-head">
-            <div>
-              <span class="eyebrow">Decision guidance</span>
-              <h2>Compare by use case</h2>
-            </div>
-          </div>
-          <div class="use-case-grid">
-            <article class="info-card">
-              <h3>Writing & ideation</h3>
-              <p>Best for summarizing, drafting, and refining everyday content.</p>
-            </article>
-            <article class="info-card">
-              <h3>Research & citations</h3>
-              <p>Useful when source attribution and speed matter more than deep creative control.</p>
-            </article>
-            <article class="info-card">
-              <h3>Coding assistance</h3>
-              <p>Helps with autocompletion, debugging, and dev workflow integration.</p>
-            </article>
-            <article class="info-card">
-              <h3>Image generation</h3>
-              <p>Best for creative, concept, and visual exploration workflows.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="container">
-          <div class="section-head">
-            <div>
-              <span class="eyebrow">Latest updates</span>
-              <h2>AI news and announcements</h2>
-            </div>
-            <a href="news.html" class="inline-link">View all news →</a>
-          </div>
-          <div id="featured-news" class="news-list compact"></div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <div class="container footer-shell">
-        <p>AI Compass — independent AI discovery and comparison.</p>
-        <p>Data is curated from official product pages and public announcements when available.</p>
-      </div>
-    </footer>
-
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        window.aiCompassApp && window.aiCompassApp.initHome();
-      });
-    </script>
+    </div>
   </body>
 </html>
